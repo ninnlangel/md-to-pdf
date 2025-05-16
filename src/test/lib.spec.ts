@@ -4,7 +4,7 @@ import { EOL } from 'os';
 import { posix, resolve, sep } from 'path';
 import { defaultConfig } from '../lib/config';
 import { getHtml } from '../lib/get-html';
-import { getMarked } from '../lib/get-marked-with-highlighter';
+import { getMarked } from '../lib/markdown-it-parser';
 import { getOutputFilePath } from '../lib/get-output-file-path';
 import { getDir, getMarginObject } from '../lib/helpers';
 import { isHttpUrl } from '../lib/is-http-url';
