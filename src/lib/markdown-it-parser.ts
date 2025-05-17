@@ -32,16 +32,14 @@ export const getMarked = (options: any = {}, extensions: any[] = []) => {
     const markedLike: MarkedLikeFunction & { setOptions?: any; use?: any } =
         (markdown: string) => md.render(markdown);
 
-    // Add dummy methods to maintain compatibility with code that might call them
-    markedLike.setOptions = () => {
-        // This is just a compatibility stub - options are set at initialization
-        console.warn('setOptions called on markdownit wrapper - this may not behave as expected');
+    // Add methods to maintain compatibility with code that might call them
+    markedLike.setOptions = (newOptions: any) => {
+        Object.assign(md.options, newOptions);
         return markedLike;
     };
 
-    markedLike.use = () => {
-        // This is just a compatibility stub - extensions are set at initialization
-        console.warn('use called on markdownit wrapper - this may not behave as expected');
+    markedLike.use = (plugin: any, ...pluginOptions: any[]) => {
+        md.use(plugin, ...pluginOptions);
         return markedLike;
     };
 

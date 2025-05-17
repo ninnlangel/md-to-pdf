@@ -24,7 +24,10 @@ export const defaultConfig: Config = {
 			left: '20mm',
 		},
 	},
-	launch_options: {},
+	launch_options: {
+		headless: "new",
+		args: ['--no-sandbox', '--disable-setuid-sandbox'],
+	},
 	gray_matter_options: {
 		engines: {
 			js: () =>
@@ -174,5 +177,6 @@ interface BasicConfig {
 	 */
 	marked_extensions: marked.MarkedExtension[];
 }
+
 
 export type PuppeteerLaunchOptions = Parameters<typeof launch>[0];
