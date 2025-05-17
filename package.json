@@ -1,7 +1,7 @@
 {
   "name": "md-to-pdf",
   "version": "5.2.4",
-  "description": "CLI tool for converting Markdown files to PDF.",
+  "description": "CLI tool for converting Markdown files to PDF - this forked version adds support for Markdown-it",
   "keywords": [
     "markdown-to-pdf",
     "cli",
@@ -38,10 +38,10 @@
     "md-to-pdf": "dist/cli.js",
     "md2pdf": "dist/cli.js"
   },
-  "author": "Simon Haenisch (https://github.com/simonhaenisch)",
+  "author": "Ninn Langel (https://github.com/ninnlangel)",
   "license": "MIT",
-  "repository": "simonhaenisch/md-to-pdf",
-  "homepage": "https://github.com/simonhaenisch/md-to-pdf#readme",
+  "repository": "ninnlangel/md-to-pdf",
+  "homepage": "https://github.com/ninnlangel/md-to-pdf#readme",
   "dependencies": {
     "arg": "^5.0.2",
     "chalk": "^4.1.2",

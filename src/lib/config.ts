@@ -25,7 +25,7 @@ export const defaultConfig: Config = {
 		},
 	},
 	launch_options: {
-		headless: "new",
+		headless: true,
 		args: ['--no-sandbox', '--disable-setuid-sandbox'],
 	},
 	gray_matter_options: {
