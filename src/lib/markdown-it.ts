@@ -1,7 +1,7 @@
 import MarkdownIt from 'markdown-it';
 import hljs from 'highlight.js';
 import markdownItAnchor from 'markdown-it-anchor';
-import markdownItCallouts from 'markdown-it-callouts'; // <-- Add this import
+import markdownItCallouts from 'markdown-it-callouts';
 
 type MarkedLikeFunction = (markdown: string) => string;
 
