@@ -1,40 +1,38 @@
 import MarkdownIt from 'markdown-it';
 import hljs from 'highlight.js';
-import markdownItAnchor from 'markdown-it-anchor'; // Import markdown-it-anchor
+import markdownItAnchor from 'markdown-it-anchor';
+import markdownItCallouts from 'markdown-it-callouts'; // <-- Add this import
 
-// Create a type that mimics the marked function signature
 type MarkedLikeFunction = (markdown: string) => string;
 
 export const getMarked = (options: any = {}, extensions: any[] = []) => {
-    // Create the markdown-it instance with built-in syntax highlighting
     const md = new MarkdownIt({
-        html: true, // Allow HTML tags in the Markdown
-        linkify: true, // Automatically convert URLs into clickable links
-        typographer: true, // Enable smart quotes and other typographic replacements
-        langPrefix: 'hljs ', // Add a class prefix for syntax highlighting
+        html: true,
+        linkify: true,
+        typographer: true,
+        langPrefix: 'hljs ',
         highlight: (code: string, language: string) => {
             const validLanguage = hljs.getLanguage(language) ? language : 'plaintext';
             return hljs.highlight(code, { language: validLanguage }).value;
         },
-        ...options, // Allow overriding default options
+        ...options,
     });
 
-    // Conditionally apply markdown-it-anchor plugin
+    // Always enable markdown-it-callouts by default
+    md.use(markdownItCallouts);
+
     if (options.headerIDs !== false) {
         md.use(markdownItAnchor, {
             permalink: false,
             slugify: (str: string) => {
-                // Example: Convert to lowercase, replace spaces with dashes, and remove special characters
                 return str
                     .toLowerCase()
-                    .replace(/[\s]+/g, '-') // Replace spaces with dashes
-                    .replace(/[^\w-]/g, ''); // Remove non-alphanumeric characters
+                    .replace(/[\s]+/g, '-')
+                    .replace(/[^\w-]/g, '');
             },
         });
     }
 
-
-    // Apply additional plugins (extensions)
     extensions.forEach((plugin) => {
         if (typeof plugin === 'function') {
             md.use(plugin);
@@ -45,11 +43,9 @@ export const getMarked = (options: any = {}, extensions: any[] = []) => {
         }
     });
 
-    // Create a function that mimics marked's interface
     const markedLike: MarkedLikeFunction & { setOptions?: any; use?: any } =
         (markdown: string) => md.render(markdown);
 
-    // Add methods to maintain compatibility with code that might call them
     markedLike.setOptions = (newOptions: any) => {
         Object.assign(md.options, newOptions);
         return markedLike;
