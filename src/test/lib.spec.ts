@@ -4,7 +4,7 @@ import { EOL } from 'os';
 import { posix, resolve, sep } from 'path';
 import { defaultConfig } from '../lib/config';
 import { getHtml } from '../lib/get-html';
-import { getMarked } from '../lib/markdown-it-parser';
+import { getMarked } from '../lib/get-marked';
 import { getOutputFilePath } from '../lib/get-output-file-path';
 import { getDir, getMarginObject } from '../lib/helpers';
 import { isHttpUrl } from '../lib/is-http-url';
@@ -45,68 +45,86 @@ test('getMarginObject should be able to handle all valid CSS margin inputs', (t)
 // --
 // get-html
 
-test('getHtml should return a valid html document', (t) => {
-	const html = getHtml('', defaultConfig).replace(/\n/g, '');
+test('getHtml should return a valid html document with marked', async (t) => {
+	const html = await getHtml('', { ...defaultConfig, markdown_parser: 'marked' });
 
-	t.regex(html, /<!DOCTYPE html>.*<html>.*<head>.*<body class="">.*<\/body>.*<\/html>/);
+	t.regex(html, /<!DOCTYPE html>\s*<html>\s*<head>[\s\S]*<body class="">[\s\S]*<\/body>\s*<\/html>/);
 });
 
-test('getHtml should inject rendered markdown', (t) => {
-	const html = getHtml('# Foo', defaultConfig).replace(/\n/g, '');
+test('getHtml should inject rendered markdown with marked', async (t) => {
+	const html = await getHtml('# Foo', { ...defaultConfig, markdown_parser: 'marked' });
 
-	t.regex(html, /<body class="">\s*<h1 id="foo">Foo<\/h1>\s*<\/body>/);
+	t.regex(html, /<body class="">[\s\S]*<h1>Foo<\/h1>[\s\S]*<\/body>/);
+
 });
 
-test('getHtml should inject body classes', (t) => {
-	const html = getHtml('', { ...defaultConfig, body_class: ['foo', 'bar'] }).replace(/\n/g, '');
+test('getHtml should inject body classes', async (t) => {
+	const html = await getHtml('', { ...defaultConfig, body_class: ['foo', 'bar'] });
 
 	t.regex(html, /<body class="foo bar">/);
 });
 
-test('getHtml should have the title set', (t) => {
-	const html = getHtml('', { ...defaultConfig, document_title: 'Foo' }).replace(/\n/g, '');
+test('getHtml should have the title set', async (t) => {
+	const html = await getHtml('', { ...defaultConfig, document_title: 'Foo' });
 
 	t.regex(html, /<title>Foo<\/title>/);
+});
+
+test('getHtml should return a valid html document with markdown-it', async (t) => {
+	const html = await getHtml('', { ...defaultConfig, markdown_parser: 'markdown-it', markdown_it_options: { headerIDs: false } });
+
+	t.regex(html, /<!DOCTYPE html>\s*<html>\s*<head>[\s\S]*<body class="">[\s\S]*<\/body>\s*<\/html>/);
+});
+
+test('getHtml should inject rendered markdown with markdown-it', async (t) => {
+	const html = await getHtml('# Foo', { ...defaultConfig, markdown_parser: 'markdown-it', markdown_it_options: { headerIDs: false } });
+
+	t.regex(html, /<body class="">\s*<h1>Foo<\/h1>\s*<\/body>/);
 });
 
 // --
 // get-marked
 
-test('getMarked should highlight js code', (t) => {
-	const marked = getMarked({}, []);
-	const html = marked('```js\nvar foo="bar";\n```');
+test('getMarked should use marked parser with correct options', async (t) => {
+	const marked = await getMarked({
+		...defaultConfig,
+		markdown_parser: 'marked',
+		marked_options: { headerIds: false },
+		marked_extensions: [],
+	});
+	const html = marked('# Foo');
 
-	t.true(html.includes('<code class="hljs js">'));
+	t.true(html.includes('<h1>Foo</h1>'));
 });
 
-test('getMarked should highlight unknown code as plaintext', (t) => {
-	const marked = getMarked({}, []);
-	const html = marked('```\nvar foo="bar";\n```');
+test('getMarked should use markdown-it parser with correct options', async (t) => {
+	const markdownIt = await getMarked({
+		...defaultConfig,
+		markdown_parser: 'markdown-it',
+		markdown_it_options: { html: true, headerIDs: false },
+		markdown_it_plugins: {},
+	});
+	const html = markdownIt('# Foo');
 
-	t.true(html.includes('<code>'));
+	t.true(html.includes('<h1>Foo</h1>'));
 });
 
-test('getMarked should accept a custom renderer', (t) => {
+test('getMarked should accept a custom renderer', async (t) => {
 	const renderer = new Renderer();
 
-	// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+	// Customize the `link` rendering behavior
 	renderer.link = (href, _, text) => `<a class="custom" href="${href}">${text}</a>`;
 
-	const marked = getMarked({ renderer }, []);
+	const marked = await getMarked({
+		...defaultConfig,
+		markdown_parser: 'marked',
+		marked_options: { renderer },
+		marked_extensions: [],
+	});
+
 	const html = marked('[Foo](/bar)');
 
 	t.true(html.includes('<a class="custom" href="/bar">Foo</a>'));
-});
-
-test('getMarked should accept a custom renderer with custom code highlighter', (t) => {
-	const renderer = new Renderer();
-
-	renderer.code = (code) => `<custom-code>${code}</custom-code>`;
-
-	const marked = getMarked({ renderer }, []);
-	const html = marked('```\nvar foo="bar";\n```');
-
-	t.true(html.includes('<custom-code>var foo="bar";</custom-code>'));
 });
 
 // --

@@ -39,6 +39,11 @@ export const defaultConfig: Config = {
 	as_html: false,
 	devtools: false,
 	marked_extensions: [],
+	markdown_parser: 'markdown-it',
+	markdown_it_options: {
+	},
+	markdown_it_plugins: {
+	},
 };
 
 /**
@@ -174,7 +179,28 @@ interface BasicConfig {
 	 * @see https://marked.js.org/using_pro#extensions
 	 */
 	marked_extensions: marked.MarkedExtension[];
-}
 
+	/**
+	 * Markdown parser to use. Default: `marked`
+	 * marked is the default parser, but you can use `markdown-it`.
+	 */
+	markdown_parser: 'marked' | 'markdown-it';
+
+	/**
+	 *  Options for the markdown-it parser.
+	 *  @see https://markdown-it.github.io/markdown-it/#Markdown-it
+	 */
+	markdown_it_options: {
+		[option: string]: any;
+	}
+
+	/**
+	 *  Markdown-it plugins to use.
+	 *  @see https://markdown-it.github.io/markdown-it/#Markdown-it
+	 */
+	markdown_it_plugins: {
+		[plugin: string]: any;
+	}
+}
 
 export type PuppeteerLaunchOptions = Parameters<typeof launch>[0];

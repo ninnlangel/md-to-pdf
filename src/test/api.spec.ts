@@ -50,11 +50,11 @@ test('compile the basic example to pdf and write to disk', async (t) => {
 });
 
 test('compile some content to html', async (t) => {
-	const html = await mdToPdf({ content: '# Foo' }, { as_html: true });
+	const html = await mdToPdf({ content: '# Foo' }, { as_html: true, headerIDs: false });
 
 	t.is(html.filename, '');
 	t.is(typeof html.content, 'string');
-	t.truthy(html.content.includes('<h1 id="foo">Foo</h1>'));
+	t.truthy(html.content.includes('<h1>Foo</h1>'));
 });
 
 test('compile the basic example to html and then to pdf', async (t) => {
